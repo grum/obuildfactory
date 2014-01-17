@@ -16,27 +16,14 @@ Public Oracle bug ID: unknown, apparently not assigned yet
 
 Index: jdk/src/macosx/classes/sun/awt/CGraphicsDevice.java
 ===================================================================
---- jdk/src/macosx/classes/sun/awt/CGraphicsDevice.java.orig
-+++ jdk/src/macosx/classes/sun/awt/CGraphicsDevice.java
-@@ -197,6 +197,8 @@ public class CGraphicsDevice extends Gra
-         if (dm == null) {
-             throw new IllegalArgumentException("Attempt to set null as a DisplayMode");
-         }
-+        if (dm.equals(getDisplayMode()))
-+            return;
-         nativeSetDisplayMode(displayID, dm.getWidth(), dm.getHeight(), dm.getBitDepth(), dm.getRefreshRate());
-         if (isFullScreenSupported() && getFullScreenWindow() != null) {
-             getFullScreenWindow().setSize(dm.getWidth(), dm.getHeight());
-Index: jdk/src/macosx/native/sun/awt/CGraphicsDevice.m
-===================================================================
---- jdk/src/macosx/native/sun/awt/CGraphicsDevice.m.orig
-+++ jdk/src/macosx/native/sun/awt/CGraphicsDevice.m
-@@ -79,7 +79,7 @@ static CGDisplayModeRef getBestModeForPa
+--- jdk/src/macosx/native/sun/awt/CGraphicsDevice.m	Thu Jan 16 11:52:13 2014 -0800
++++ jdk/src/macosx/native/sun/awt/CGraphicsDevice.m	Fri Jan 17 14:36:07 2014 +0100
+@@ -76,7 +76,7 @@
+ 
+         // Refresh rate might be 0 in display mode and we ask for specific display rate
+         // but if we do not find exact match then 0 refresh rate might be just Ok
+-        if (CGDisplayModeGetRefreshRate(cRef) == refrate) {
++        if ((int) CGDisplayModeGetRefreshRate(cRef) == refrate) {
              // Exact match
              return cRef;
-         }
--        if (CGDisplayModeGetRefreshRate(cRef) == 0) {
-+        if ((int)CGDisplayModeGetRefreshRate(cRef) == 0) {
-             // Not exactly what was asked for, but may fit our needs if we don't find an exact match
-             bestGuess = cRef;
          }

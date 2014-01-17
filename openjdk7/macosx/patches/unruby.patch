@@ -8,8 +8,14 @@ altogether, using bash instead.
 
 Index: jdk/src/macosx/native/jobjc/rungen
 ===================================================================
---- jdk/src/macosx/native/jobjc/rungen.orig
-+++ jdk/src/macosx/native/jobjc/rungen
+--- jdk/src/macosx/native/jobjc/rungen	Thu Jan 16 11:52:13 2014 -0800
++++ jdk/src/macosx/native/jobjc/rungen	Fri Jan 17 14:43:12 2014 +0100
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env ruby
++#!/usr/bin/env bash
+ #
+ # Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+ # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 @@ -25,43 +25,44 @@
  #
  #
@@ -25,36 +31,33 @@ Index: jdk/src/macosx/native/jobjc/rungen
 -OBJROOT = ARGV[3]
 -ARCHS   = ARGV[4]
 -STABLE_GEN_DIR = ARGV[5]
--
--ourJavaHome = ENV['JAVA_HOME']
--ourJavaVersion = `java -fullversion 2>&1`
--$stderr.puts "ENV['JAVA_HOME'] = #{ourJavaHome}"
--$stderr.puts "java -fullversion = #{ourJavaVersion}"
--
--$stderr.puts "jobjc_jar = #{JOBJC_JAR}"
--$stderr.puts "libpath = #{LIBPATH}"
--$stderr.puts "objroot = #{OBJROOT}"
--$stderr.puts "ARCHS   = #{ARCHS}"
--$stderr.puts "STABLE_GEN_DIR = #{STABLE_GEN_DIR}"
--
--jarch = if ARCHS =~ /x86_64/ then "-d64" else "-d32" end
 +JOBJC_JAR=$2
 +LIBPATH=$3
 +OBJROOT=$4
 +ARCHS=$5
 +STABLE_GEN_DIR=$6
-+
+ 
+-ourJavaHome = ENV['JAVA_HOME']
+-ourJavaVersion = `java -fullversion 2>&1`
+-$stderr.puts "ENV['JAVA_HOME'] = #{ourJavaHome}"
+-$stderr.puts "java -fullversion = #{ourJavaVersion}"
 +ourJavaHome=${JAVA_HOME}
 +ourJavaVersion="$(java -fullversion 2>&1)"
 +echo "ENV['JAVA_HOME'] = ${ourJavaHome}"
 +echo "java -fullversion = ${ourJavaVersion}"
-+
+ 
+-$stderr.puts "jobjc_jar = #{JOBJC_JAR}"
+-$stderr.puts "libpath = #{LIBPATH}"
+-$stderr.puts "objroot = #{OBJROOT}"
+-$stderr.puts "ARCHS   = #{ARCHS}"
+-$stderr.puts "STABLE_GEN_DIR = #{STABLE_GEN_DIR}"
 +echo "jobjc_jar = ${JOBJC_JAR}"
 +echo "libpath = ${LIBPATH}"
 +echo "objroot = ${OBJROOT}"
 +echo "ARCHS   = ${ARCHS}"
 +echo "STABLE_GEN_DIR = ${STABLE_GEN_DIR}"
-+
+ 
+-jarch = if ARCHS =~ /x86_64/ then "-d64" else "-d32" end
 +if [[ $ARCGS == *x86_64* ]]; then
 +  jarch = "-d64"
 +else
@@ -77,18 +80,18 @@ Index: jdk/src/macosx/native/jobjc/rungen
  # we run the generator with our newly created JObjC.  The installed version (if available) has been removed from
  # the boot class path, so we are building with everything newly created.
 -cmd = "java #{jarch} -Xms128m -Xmx512m -Djava.library.path=#{LIBPATH} -Xbootclasspath:#{bootclasspath.chomp} -classpath #{OBJROOT}/bin/core:#{OBJROOT}/bin/generator -ea com.apple.internal.jobjc.generator.Generator dst=#{OBJROOT}/src/jobjc frameworks=#{STABLE_GEN_DIR}"
--
--$stderr.puts cmd
--puts `#{cmd} 2>&1`
 +cmd="java ${jarch} -Xms128m -Xmx512m -Djava.library.path=${LIBPATH} -Xbootclasspath:${bootclasspath} -classpath ${OBJROOT}/bin/core:${OBJROOT}/bin/generator -ea com.apple.internal.jobjc.generator.Generator dst=${OBJROOT}/src/jobjc frameworks=${STABLE_GEN_DIR}"
  
+-$stderr.puts cmd
+-puts `#{cmd} 2>&1`
+-
 -raise $?.to_i if $?.to_i != 0
 +echo "$cmd"
 +exec ${cmd} 2>&1
 Index: jdk/src/macosx/native/jobjc/build.xml
 ===================================================================
---- jdk/src/macosx/native/jobjc/build.xml.orig
-+++ jdk/src/macosx/native/jobjc/build.xml
+--- jdk/src/macosx/native/jobjc/build.xml	Thu Jan 16 11:52:13 2014 -0800
++++ jdk/src/macosx/native/jobjc/build.xml	Fri Jan 17 14:43:12 2014 +0100
 @@ -128,7 +128,7 @@
    <property name="product.jarfile" location="${product.jarfile.dir}/${product.jarfile.name}"/>
  
@@ -109,11 +112,11 @@ Index: jdk/src/macosx/native/jobjc/build.xml
        <arg value="${product.jarfile.name}"/>
 Index: jdk/src/macosx/native/jobjc/run-and-write-if-okay
 ===================================================================
---- jdk/src/macosx/native/jobjc/run-and-write-if-okay.orig
-+++ jdk/src/macosx/native/jobjc/run-and-write-if-okay
+--- jdk/src/macosx/native/jobjc/run-and-write-if-okay	Thu Jan 16 11:52:13 2014 -0800
++++ jdk/src/macosx/native/jobjc/run-and-write-if-okay	Fri Jan 17 14:43:12 2014 +0100
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env ruby
-+#!/bin/bash
++#!/usr/bin/env bash
  #
  # Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
  # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
@@ -156,3 +159,4 @@ Index: jdk/src/macosx/native/jobjc/run-and-write-if-okay
 -end
 +  echo "${EXECPATH} failed to run trial. Ignoring."
 +fi
+
