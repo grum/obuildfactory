@@ -171,6 +171,7 @@ function build_old()
   export HOTSPOT_BUILD_JOBS=$NUM_CPUS
   export PARALLEL_COMPILE_JOBS=$NUM_CPUS
   export JAVA_HOME=
+  export ARCH=$OBF_BASE_ARCH
 
   if [ "$XDEBUG" = "true" ]; then
     export SKIP_FASTDEBUG_BUILD=false
